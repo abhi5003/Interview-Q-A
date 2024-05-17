@@ -66,6 +66,268 @@ Here, `myDatabase` is the name of your database. If it doesn't exist, MongoDB wi
 
 ### Basic CRUD Operations
 
+#### Insert Operations
+
+**Insert a Single Document:**
+
+```javascript
+db.myCollection.insertOne({
+    name: "John Doe",
+    age: 29,
+    hobbies: ["reading", "travelling"]
+});
+```
+
+* **Explanation:** Inserts a single document into `myCollection`. The document contains fields `name`, `age`, and `hobbies`.
+
+**Insert Multiple Documents:**
+
+```javascript
+db.myCollection.insertMany([
+    { name: "Alice", age: 25, job: "Engineer" },
+    { name: "Bob", age: 30, job: "Designer" }
+]);
+```
+
+* **Explanation:** Inserts multiple documents into `myCollection`.
+
+#### Query Operations
+
+**Find All Documents:**
+
+```javascript
+db.myCollection.find().pretty();
+```
+
+* **Explanation:** Retrieves all documents from `myCollection` and formats them for readability.
+
+**Find Documents with a Condition:**
+
+```javascript
+db.myCollection.find({ age: { $gt: 25 } });
+```
+
+* **Explanation:** Retrieves documents where the `age` field is greater than 25.
+
+**Find a Single Document:**
+
+```javascript
+db.myCollection.findOne({ name: "Alice" });
+```
+
+* **Explanation:** Retrieves the first document that matches the condition `{ name: "Alice" }`.
+
+#### Update Operations
+
+**Update a Single Document:**
+
+```javascript
+db.myCollection.updateOne(
+    { name: "Alice" },
+    { $set: { age: 26 } }
+);
+```
+
+* **Explanation:** Updates the first document that matches the condition `{ name: "Alice" }` by setting the `age` field to 26.
+
+**Update Multiple Documents:**
+
+```javascript
+db.myCollection.updateMany(
+    { job: "Engineer" },
+    { $set: { status: "active" } }
+);
+```
+
+* **Explanation:** Updates all documents that match the condition `{ job: "Engineer" }` by setting the `status` field to "active".
+
+#### Delete Operations
+
+**Delete a Single Document:**
+
+```javascript
+db.myCollection.deleteOne({ name: "Alice" });
+```
+
+* **Explanation:** Deletes the first document that matches the condition `{ name: "Alice" }`.
+
+**Delete Multiple Documents:**
+
+```javascript
+db.myCollection.deleteMany({ job: "Designer" });
+```
+
+* **Explanation:** Deletes all documents that match the condition `{ job: "Designer" }`.
+
+### Aggregation Framework
+
+The aggregation framework allows you to perform complex data processing and analysis.
+
+**Group and Count:**
+
+```javascript
+db.myCollection.aggregate([
+    { $group: { _id: "$job", count: { $sum: 1 } } }
+]);
+```
+
+* **Explanation:** Groups documents by the `job` field and counts the number of documents in each group.
+
+**Match and Project:**
+
+```javascript
+db.myCollection.aggregate([
+    { $match: { age: { $gte: 25 } } },
+    { $project: { name: 1, age: 1, _id: 0 } }
+]);
+```
+
+* **Explanation:** Filters documents where the `age` field is greater than or equal to 25, then includes only the `name` and `age` fields in the result, excluding the `_id` field.
+
+### Indexing
+
+Indexes improve the performance of query operations.
+
+**Create an Index:**
+
+```javascript
+db.myCollection.createIndex({ name: 1 });
+```
+
+* **Explanation:** Creates an ascending index on the `name` field.
+
+**Create a Compound Index:**
+
+```javascript
+db.myCollection.createIndex({ name: 1, age: -1 });
+```
+
+* **Explanation:** Creates a compound index on the `name` field (ascending) and the `age` field (descending).
+
+### Text Search
+
+Text search allows you to search for text within documents.
+
+**Create a Text Index:**
+
+```javascript
+db.myCollection.createIndex({ description: "text" });
+```
+
+* **Explanation:** Creates a text index on the `description` field.
+
+**Perform a Text Search:**
+
+```javascript
+db.myCollection.find({ $text: { $search: "mongodb tutorial" } });
+```
+
+* **Explanation:** Searches for documents containing the text "mongodb tutorial" in the indexed fields.
+
+### Working with Arrays
+
+**Query for Documents with an Array Element:**
+
+```javascript
+db.myCollection.find({ hobbies: "reading" });
+```
+
+* **Explanation:** Finds all documents where the `hobbies` array contains the element "reading".
+
+**Query for Documents with All Array Elements:**
+
+```javascript
+db.myCollection.find({ hobbies: { $all: ["reading", "travelling"] } });
+```
+
+* **Explanation:** Finds all documents where the `hobbies` array contains both "reading" and "travelling".
+
+### Using $elemMatch with Arrays
+
+**Query for Documents with Matching Array Sub-Documents:**
+
+```javascript
+db.myCollection.find({ skills: { $elemMatch: { name: "JavaScript", level: { $gte: 3 } } } });
+```
+
+* **Explanation:** Finds all documents where the `skills` array contains an element that matches both `{ name: "JavaScript" }` and `{ level: { $gte: 3 } }`.
+
+### Date Queries
+
+**Query Documents by Date Range:**
+
+```javascript
+db.myCollection.find({
+    createdAt: {
+        $gte: ISODate("2023-01-01T00:00:00Z"),
+        $lt: ISODate("2024-01-01T00:00:00Z")
+    }
+});
+```
+
+* **Explanation:** Finds all documents where the `createdAt` field is within the specified date range.
+
+### Practical Example
+
+Let's put these queries into practice with an example collection `employees`.
+
+**Insert Example Documents:**
+
+```javascript
+db.employees.insertMany([
+    { name: "John Doe", age: 29, job: "Developer", skills: [{ name: "JavaScript", level: 3 }, { name: "MongoDB", level: 2 }], createdAt: new Date("2023-03-01T08:00:00Z") },
+    { name: "Jane Smith", age: 32, job: "Designer", skills: [{ name: "Photoshop", level: 4 }, { name: "Illustrator", level: 3 }], createdAt: new Date("2023-04-01T08:00:00Z") }
+]);
+```
+
+**Find All Employees:**
+
+```javascript
+db.employees.find().pretty();
+```
+
+**Find Employees Older Than 30:**
+
+```javascript
+db.employees.find({ age: { $gt: 30 } });
+```
+
+**Update Jane Smith's Job:**
+
+```javascript
+db.employees.updateOne(
+    { name: "Jane Smith" },
+    { $set: { job: "Senior Designer" } }
+);
+```
+
+**Delete Employees Younger Than 30:**
+
+```javascript
+db.employees.deleteMany({ age: { $lt: 30 } });
+```
+
+**Group Employees by Job:**
+
+```javascript
+db.employees.aggregate([
+    { $group: { _id: "$job", count: { $sum: 1 } } }
+]);
+```
+
+**Create Index on Name:**
+
+```javascript
+db.employees.createIndex({ name: 1 });
+```
+
+**Find Employees with JavaScript Skill Level 3 or Higher:**
+
+```javascript
+db.employees.find({ skills: { $elemMatch: { name: "JavaScript", level: { $gte: 3 } } } });
+```
+
+These examples cover basic and advanced MongoDB operations. Understanding these will help you effectively use MongoDB and be prepared for interviews.
 
 ## Prompt:
 Can explain more each steps
@@ -367,4 +629,6 @@ db.employees.find({ skills: { $elemMatch: { name: "JavaScript", level: { $gte: 3
 * **Explanation:** Finds all employees where the `skills` array contains an element with `name` "JavaScript" and `level` greater than or equal to 3.
 
 These detailed explanations cover basic and advanced MongoDB operations, providing a solid foundation for working with MongoDB and preparing for interviews.
+
+
 
